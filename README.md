@@ -100,11 +100,13 @@ module "example_linux_launch_template" {
       market_type = "spot"
     }
 
-    # optional (x2)
+    # optional
     instance_type = "t2.micro"
-    kernel_id     = "5.10"
+    
+    # optional defaults to null
+    kernel_id = "aki-xxxxxxxx"
 
-    key_name      = "main-us-east-1"
+    key_name = "main-us-east-1"
 
     # optional, defaults to null
     license_specification = {
@@ -146,7 +148,7 @@ module "example_linux_launch_template" {
     # optional, defaults to null
     ram_disk_id = "test"
 
-    # optional, defaults to resource_type = "instance", tag={}
+    # optional, defaults to resource_type = "instance" & tag={}
     tag_specifications = {
       resource_type = "instance"
       tags = {
@@ -155,7 +157,7 @@ module "example_linux_launch_template" {
     }
 
     # optional, defaults to null
-    # save user_data.sh script in module and provide path to file
+    # save user_data.sh script in module and provide path to script
     path_to_user_data_script = "scripts/test_script.sh"
   }
 
