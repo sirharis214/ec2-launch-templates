@@ -188,8 +188,8 @@ module "example_linux_launch_template" {
 ``` 
 
 ## Windows | Minimum config - in VPC
-[!IMPORTANT]  
-variable **launch_template.os** is important here
+> **Note**
+> variable **launch_template.os** is important here
 
 ```hcl
 module "example_windows_launch_template" {
