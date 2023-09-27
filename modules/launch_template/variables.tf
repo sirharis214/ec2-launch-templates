@@ -3,23 +3,13 @@ variable "project_tags" {
   description = "Incoming project tags to be merged with local module tags"
 }
 
-variable "enable_linux" {
-  type        = bool
-  description = "create Linux based launch template"
-  default     = true
-}
-
-variable "enable_windows" {
-  type        = bool
-  description = "create Windows based launch template"
-  default     = true
-}
-
-variable "linux_temp" {
+variable "launch_template" {
   type = object({
     name_prefix = string
 
-    block_device_mappings = optional(
+    os = optional(string, "linux")
+
+    linux_block_device_mappings = optional(
       object({
         device_name = string,
         ebs = object({volume_size = number})
@@ -27,6 +17,17 @@ variable "linux_temp" {
       {
         device_name = "/dev/xvda",
         ebs = {volume_size = 8}
+      }
+    ),
+
+    windows_block_device_mappings = optional(
+      object({
+        device_name = string,
+        ebs = object({volume_size = number})
+      }),
+      {
+        device_name = "/dev/sda1",
+        ebs = {volume_size = 30}
       }
     ),
 
@@ -45,8 +46,8 @@ variable "linux_temp" {
         threads_per_core = number
       }),
       {
-        core_count = 1
-        threads_per_core = 1
+        core_count = null
+        threads_per_core = null
       }
     ),
 
@@ -59,9 +60,9 @@ variable "linux_temp" {
       }
     ),
 
-    disable_api_stop        = optional(bool, true)
-    disable_api_termination = optional(bool, true)
-    ebs_optimized           = optional(bool, false)
+    disable_api_stop        = optional(bool, false) # If true, enables EC2 Instance Stop Protection.
+    disable_api_termination = optional(bool, false) # If true, enables EC2 Instance Termination Protection
+    ebs_optimized           = optional(bool, false) # If true, the launched EC2 instance will be EBS-optimized
 
     elastic_gpu_specifications = optional(
       object({

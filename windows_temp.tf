@@ -1,14 +1,15 @@
-module "linux_temp" {
+module "windows_temp" {
   source = "./modules/launch_template"
 
   launch_template = {
-    name_prefix = "main-linux-temp"
+    name_prefix = "main-windows-temp"
+    os          = "windows"
 
     iam_instance_profile = {
       name = "main-ec2-profile"
     }
 
-    image_id = "ami-00c6177f250e07ec1" # Amazon Linux 2
+    image_id = "ami-0be0e902919675894" # Microsoft Windows Server 2022 Base
     key_name = "main-us-east-1"
 
     network_interfaces = {
@@ -24,7 +25,7 @@ module "linux_temp" {
 
     tag_specifications = {
       tags = {
-        OS = "linux"
+        OS = "windows"
       }
     }
   }
