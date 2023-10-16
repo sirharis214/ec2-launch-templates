@@ -6,8 +6,7 @@ variable "project_tags" {
 variable "launch_template" {
   type = object({
     name_prefix = string
-
-    os = optional(string, "linux")
+    os          = optional(string, "linux")
 
     linux_block_device_mappings = optional(
       object({
@@ -45,10 +44,7 @@ variable "launch_template" {
         core_count = number
         threads_per_core = number
       }),
-      {
-        core_count = null
-        threads_per_core = null
-      }
+      null
     ),
 
     credit_specification = optional(
@@ -82,8 +78,6 @@ variable "launch_template" {
       }
     ),
 
-    image_id = string
-
     instance_initiated_shutdown_behavior = optional(string, "terminate")
 
     instance_market_options = optional(
@@ -97,7 +91,6 @@ variable "launch_template" {
 
     instance_type = optional(string, "t2.micro")
     kernel_id     = optional(string, null)
-    key_name      = string
 
     license_specification = optional(
       object({
@@ -132,32 +125,6 @@ variable "launch_template" {
       }
     ),
 
-    network_interfaces = optional(
-      object({
-        associate_public_ip_address = optional(bool)
-        delete_on_termination = optional(bool)
-        security_groups = list(string)
-        subnet_id = string
-      }),
-      {
-        associate_public_ip_address = null
-        delete_on_termination = null
-        security_groups = null
-        subnet_id = null
-      }
-    ),
-
-    placement = optional(
-      object({
-        availability_zone = string
-        tenancy = optional(string)
-      }),
-      {
-        availability_zone = null
-        tenancy = "default"
-      }
-    ),
-
     ram_disk_id = optional(string, null)
 
     tag_specifications = optional(
@@ -172,5 +139,32 @@ variable "launch_template" {
     ),
 
     path_to_user_data_script = optional(string, null)
+
+    regions = map(
+      object({
+        image_id = string,
+        key_name = optional(string, null),
+        network_interfaces = optional(
+          object({
+            associate_public_ip_address = optional(bool, null)
+            delete_on_termination = optional(bool, null)
+            security_groups = list(string)
+            subnet_id = string
+          }),
+          null
+        ),
+        placement = optional(
+          object({
+            availability_zone = string
+            tenancy = optional(string)
+          }),
+          {
+            availability_zone = null
+            tenancy = "default"
+          }
+        ),
+        regional_tags = optional(map(any), {})
+      }) # close regions object
+    ), # close regions map
   })
 }

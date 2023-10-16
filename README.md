@@ -10,7 +10,7 @@ Launch Template relies on the value of this variable when defining the `block_de
 > If you wish to define non-default values for block_device_mappings, you only need to define the desired OS's block_device_mappings variable; ie: for Linux, only define `linux_block_device_mappings`.
 
 ## Launch Template | All options
-All optional arguments for the variable `linux_temp` default to what is defined below, unless stated otherwise.
+All optional arguments for the variable `launch_template` default to what is defined below, unless stated otherwise.
 
 ```hcl
 module "example_launch_template" {
@@ -85,6 +85,7 @@ module "example_launch_template" {
     # optional defaults to null
     kernel_id = "aki-xxxxxxxx"
 
+    # optional defaults to null
     key_name = "main-us-east-1"
 
     # optional, defaults to null
