@@ -3,21 +3,48 @@ Creating Linux and Windows based EC2 launch templates
 
 # Usage
 
-As of now, the key difference between creating a Linux based Launch Template and a Windows based is `var.launch_template.os`. The default option is `linux` so if your creating a Launch Template for Linux OS, omit this variable. If you choose to create a Windows based Launch Template, define the variable as `os = "windows"`.
+As of now, the key difference between creating a **Linux** based or **Windows** based Launch Template is the value of `var.launch_template.os`. 
 
-Launch Template relies on the value of this variable when defining the `block_device_mappings` block. If var.launch_template.os = linux, then the values for block_device_mappings will be read from `var.launch_template.linux_block_device_mappings`, otherwise it will read the values from `var.launch_template.windows_block_device_mappings`.
+* For Linux based Launch Templates: omit this variable because the default value is `linux`
+* For Windows based Launch Templates: you must define the variable var.launch_template.os and assign the value `windows`
 
-> If you wish to define non-default values for block_device_mappings, you only need to define the desired OS's block_device_mappings variable; ie: for Linux, only define `linux_block_device_mappings`.
+```hcl
+module "example_windows_temp" {
+  source = "./modules/launch_template"
+
+  launch_template = {
+    name_prefix = "example-windows-temp"
+    os          = "windows"
+  }
+}
+```
+
+Continue reading to see which variables are required regardless of the OS and which are OS dependent. See [Linux minimum config - in VPC](#linux--minimum-config---in-vpc) for an example creating Linux based Launch Template.
+
+## OS Dependent Variable
+
+Variables that are OS dependant:
+
+1. var.launch_template.**block_device_mappings**
+
+The module's aws_launch_template resource relies on the value of `var.launch_template.os` when setting configurations for `block_device_mappings`. 
+
+Theres logic in place to set the values of block_device_mappings depending on which OS the launch template is for.
+
+* If var.launch_template.os = linux, the values are read from `var.launch_template.linux_block_device_mappings`
+* If var.launch_template.os = windows, the values are read from `var.launch_template.windows_block_device_mappings`.
+
+> **linux_block_device_mappings** and **windows_block_device_mappings** are optional variables that have default values. If you choose to stick with the default values, it is suffient to only define the var.launch_template.os variable and omit the said variables.
 
 ## Launch Template | All options
 All optional arguments for the variable `launch_template` default to what is defined below, unless stated otherwise.
 
 ```hcl
-module "example_launch_template" {
+module "example_linux_launch_template" {
   source = "./modules/launch_template"
 
   launch_template = {
-    name_prefix = "main-linux-temp"
+    name_prefix = "example-linux-temp"
     
     # optional
     os = "linux"  # "linux" or "windows"
@@ -68,8 +95,6 @@ module "example_launch_template" {
       name = "main-ec2-profile"
     }
 
-    image_id = "ami-00c6177f250e07ec1" # Amazon Linux 2
-
     # optional
     instance_initiated_shutdown_behavior = "terminate"
 
@@ -84,9 +109,6 @@ module "example_launch_template" {
     
     # optional defaults to null
     kernel_id = "aki-xxxxxxxx"
-
-    # optional defaults to null
-    key_name = "main-us-east-1"
 
     # optional, defaults to null
     license_specification = {
@@ -107,28 +129,10 @@ module "example_launch_template" {
       enabled = true
     }
 
-    # optional, defaults to null; Must define if you want instances in VPC
-    network_interfaces = {
-      # optional, if network_interfaces defined
-      associate_public_ip_address = true 
-      # optional, if network_interfaces defined
-      delete_on_termination = false
-      security_groups = [
-        "sg-077d89eca08b13f9e", # main-sg
-      ]
-      subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1
-    }
-
-    # optional, availability_zone defaults to null
-    placement = {
-      availability_zone = "us-east-1a"
-      tenancy = "default"
-    }
-
     # optional, defaults to null
     ram_disk_id = "test"
 
-    # optional, defaults to resource_type = "instance" & tag={}
+    # optional, defaults to resource_type = "instance" & tag = {}
     tag_specifications = {
       resource_type = "instance"
       tags = {
@@ -139,9 +143,51 @@ module "example_launch_template" {
     # optional, defaults to null
     # save user_data.sh script in module and provide path to script
     path_to_user_data_script = "scripts/test_script.sh"
+
+    # REQUIRED
+    regions = {
+      us-east-1 = {
+        image_id = "ami-0bb4c991fa89d4b9b" # us-east-1 Amazon Linux 2
+        
+        # optional, defaults to null
+        key_name = "main-us-east-1"
+
+        # optional, defaults to null; Should define if we need EC2 instance placed in VPC
+        network_interfaces = {
+          # optional, defaults to null
+          associate_public_ip_address = true
+
+          # optional, defaults to null
+          delete_on_termination = true
+
+          security_groups = [
+            "sg-077d89eca08b13f9e" # main-sg
+          ]
+          subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1 ; us-east-1a
+        }
+
+        # optional, defaults to availability_zone = null, tenancy = "default"
+        placement = {
+          availability_zone = "us-east-1a"
+          tenancy = "default"
+        }
+
+        # optional, defaults to empty map {}
+        regional_tags = {
+          Block_Region = "us-east-1"
+        }
+      },
+    }
   }
 
   project_tags = local.tags
+
+  providers = {
+    aws           = aws
+    aws.us-east-2 = aws.us-east-2
+    aws.us-west-1 = aws.us-west-1
+    aws.us-west-2 = aws.us-west-2
+  }
 }
 ```
 
@@ -165,26 +211,30 @@ module "example_linux_launch_template" {
       name = "main-ec2-profile"
     }
 
-    # AMI id
-    image_id = "ami-00c6177f250e07ec1" # Amazon Linux 2
-    
-    # Key pair assigned at launch
-    key_name = "main-us-east-1"
-
-    # optional, defaults to null; Must define if you want instances in VPC 
-    network_interfaces = {
-      security_groups = [
-        "sg-077d89eca08b13f9e", # main-sg
-      ]
-      subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1
-    }
-
-    # optional, defaults to az=null & tenancy="default"
-    placement = {
-      availability_zone = "us-east-1a"
+    # single region launch template
+    regions = {
+      us-east-1 = {
+        image_id = "ami-0bb4c991fa89d4b9b" # us-east-1 Amazon Linux 2
+        key_name = "main-us-east-1"
+        network_interfaces = {
+          security_groups = [
+            "sg-077d89eca08b13f9e" # main-sg
+          ]
+          subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1 ; us-east-1a
+        }
+        regional_tags = {
+          Block_Region = "us-east-1"
+        }
+      },
     }
   }
   project_tags = local.tags
+  providers = {
+    aws           = aws
+    aws.us-east-2 = aws.us-east-2
+    aws.us-west-1 = aws.us-west-1
+    aws.us-west-2 = aws.us-west-2
+  }
 }
 ``` 
 
@@ -212,25 +262,36 @@ module "example_windows_launch_template" {
       name = "main-ec2-profile"
     }
 
-    # AMI id
-    image_id = "ami-00c6177f250e07ec1" # Amazon Linux 2
-    
-    # Key pair assigned at launch
-    key_name = "main-us-east-1"
-
-    # optional, defaults to null; Must define if you want instances in VPC 
-    network_interfaces = {
-      security_groups = [
-        "sg-077d89eca08b13f9e", # main-sg
-      ]
-      subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1
+    # optional, defaults tags = {}
+    tag_specifications = {
+      tags = {
+        OS = "windows"
+      }
     }
 
-    # optional, defaults to az=null & tenancy="default"
-    placement = {
-      availability_zone = "us-east-1a"
+    # single region launch template
+    regions = {
+      us-east-1 = {
+        image_id =  "ami-0be0e902919675894" # us-east-1 Microsoft Windows Server 2022 Base
+        key_name = "main-us-east-1"
+        network_interfaces = {
+          security_groups = [
+            "sg-077d89eca08b13f9e" # main-sg
+          ]
+          subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1 ; us-east-1a
+        }
+        regional_tags = {
+          Block_Region = "us-east-1"
+        }
+      },
     }
   }
   project_tags = local.tags
+  providers = {
+    aws           = aws
+    aws.us-east-2 = aws.us-east-2
+    aws.us-west-1 = aws.us-west-1
+    aws.us-west-2 = aws.us-west-2
+  }
 }
 ``` 

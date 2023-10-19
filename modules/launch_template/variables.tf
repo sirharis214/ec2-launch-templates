@@ -64,18 +64,14 @@ variable "launch_template" {
       object({
         type = string
       }),
-      {
-        type = null
-      }
+      null
     ),
 
     iam_instance_profile = optional(
       object({
         name = string
       }),
-      {
-        name = null
-      }
+      null
     ),
 
     instance_initiated_shutdown_behavior = optional(string, "terminate")
@@ -84,9 +80,7 @@ variable "launch_template" {
       object({
         market_type = string
       }),
-      {
-        market_type = null
-      }
+      null
     ),
 
     instance_type = optional(string, "t2.micro")
@@ -96,9 +90,7 @@ variable "launch_template" {
       object({
         license_configuration_arn = string
       }),
-      {
-        license_configuration_arn = null
-      }
+      null
     ),
 
     metadata_options = optional(
