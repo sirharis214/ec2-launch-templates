@@ -1,7 +1,3 @@
-output "all_regions" {
-  value = local.all_regions
-}
-
-output "all_resources" {
-  value = local.all_resources
+output "regions_to_create_EC2LT" {
+  value = local.regions_to_create_EC2LT
 }

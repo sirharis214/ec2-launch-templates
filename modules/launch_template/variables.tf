@@ -103,17 +103,12 @@ variable "launch_template" {
 
     metadata_options = optional(
       object({
-        http_endpoint               = string
-        http_tokens                 = string
-        http_put_response_hop_limit = number
-        instance_metadata_tags      = string
+        http_endpoint               = optional(string, null)
+        http_tokens                 = optional(string, null)
+        http_put_response_hop_limit = optional(number, null)
+        instance_metadata_tags      = optional(string, null)
       }),
-      {
-        http_endpoint               = null
-        http_tokens                 = null
-        http_put_response_hop_limit = null
-        instance_metadata_tags      = null
-      }
+      null
     ),
 
     monitoring = optional(
