@@ -1,3 +1,8 @@
+# v0.0.3
+* key_name optional
+* multi-region launch template support
+* README.md none-existent variable reference removed, Fixes #10
+
 # v0.0.2
 * removed empty and unrequired file modules/linux_temp/iam.tf
 * replaced module/linux_temp with module/launch_template to accommodate windows based templates
