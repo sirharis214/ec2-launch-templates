@@ -7,11 +7,11 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "= 5.14.0"
+      configuration_aliases = [
+        aws.us-east-2,
+        aws.us-west-1,
+        aws.us-west-2
+      ]
     }
   }
-}
-
-provider "aws" {
-  # Update with your desired region
-  region = "us-east-1"
 }
