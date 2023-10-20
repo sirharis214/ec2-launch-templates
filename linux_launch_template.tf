@@ -1,8 +1,8 @@
-module "test_linux_temp" {
+module "linux_temp" {
   source = "./modules/launch_template"
 
   launch_template = {
-    name_prefix = "test-linux-temp"
+    name_prefix = "main-linux-temp"
 
     iam_instance_profile = {
       name = "main-ec2-profile"
@@ -10,7 +10,8 @@ module "test_linux_temp" {
 
     tag_specifications = {
       tags = {
-        OS = "linux"
+        OS    = "linux"
+        Owner = "Haris N"
       }
     }
 
@@ -39,7 +40,7 @@ module "test_linux_temp" {
         regional_tags = {
           Block_Region = "us-east-2"
         }
-      }
+      },
     }
   }
   project_tags = local.tags

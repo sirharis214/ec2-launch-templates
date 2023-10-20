@@ -41,7 +41,7 @@ resource "aws_launch_template" "us_east_1" {
   # for list of supported instance type this is available for:
   # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/elastic-graphics.html#elastic-gpus-basics
   dynamic "elastic_gpu_specifications" {
-    for_each = var.launch_template.elastic_gpu_specifications.type != null ? [1] : []
+    for_each = var.launch_template.elastic_gpu_specifications != null ? [1] : []
     content {
       type = var.launch_template.elastic_gpu_specifications.type
     }
@@ -58,7 +58,7 @@ resource "aws_launch_template" "us_east_1" {
   instance_initiated_shutdown_behavior = var.launch_template.instance_initiated_shutdown_behavior
 
   dynamic "instance_market_options" {
-    for_each = var.launch_template.instance_market_options.market_type != null ? [1] : []
+    for_each = var.launch_template.instance_market_options != null ? [1] : []
     content {
       market_type = var.launch_template.instance_market_options.market_type
     }
@@ -69,7 +69,7 @@ resource "aws_launch_template" "us_east_1" {
   key_name      = each.value.key_name
 
   dynamic "license_specification" {
-    for_each = var.launch_template.license_specification.license_configuration_arn != null ? [1] : []
+    for_each = var.launch_template.license_specification != null ? [1] : []
     content {
       license_configuration_arn = var.launch_template.license_specification.license_configuration_arn
     }
@@ -163,7 +163,7 @@ resource "aws_launch_template" "us_east_2" {
   # for list of supported instance type this is available for:
   # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/elastic-graphics.html#elastic-gpus-basics
   dynamic "elastic_gpu_specifications" {
-    for_each = var.launch_template.elastic_gpu_specifications.type != null ? [1] : []
+    for_each = var.launch_template.elastic_gpu_specifications != null ? [1] : []
     content {
       type = var.launch_template.elastic_gpu_specifications.type
     }
@@ -180,7 +180,7 @@ resource "aws_launch_template" "us_east_2" {
   instance_initiated_shutdown_behavior = var.launch_template.instance_initiated_shutdown_behavior
 
   dynamic "instance_market_options" {
-    for_each = var.launch_template.instance_market_options.market_type != null ? [1] : []
+    for_each = var.launch_template.instance_market_options != null ? [1] : []
     content {
       market_type = var.launch_template.instance_market_options.market_type
     }
@@ -191,7 +191,7 @@ resource "aws_launch_template" "us_east_2" {
   key_name      = each.value.key_name
 
   dynamic "license_specification" {
-    for_each = var.launch_template.license_specification.license_configuration_arn != null ? [1] : []
+    for_each = var.launch_template.license_specification != null ? [1] : []
     content {
       license_configuration_arn = var.launch_template.license_specification.license_configuration_arn
     }
@@ -284,7 +284,7 @@ resource "aws_launch_template" "us_west_1" {
   # for list of supported instance type this is available for:
   # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/elastic-graphics.html#elastic-gpus-basics
   dynamic "elastic_gpu_specifications" {
-    for_each = var.launch_template.elastic_gpu_specifications.type != null ? [1] : []
+    for_each = var.launch_template.elastic_gpu_specifications != null ? [1] : []
     content {
       type = var.launch_template.elastic_gpu_specifications.type
     }
@@ -301,7 +301,7 @@ resource "aws_launch_template" "us_west_1" {
   instance_initiated_shutdown_behavior = var.launch_template.instance_initiated_shutdown_behavior
 
   dynamic "instance_market_options" {
-    for_each = var.launch_template.instance_market_options.market_type != null ? [1] : []
+    for_each = var.launch_template.instance_market_options != null ? [1] : []
     content {
       market_type = var.launch_template.instance_market_options.market_type
     }
@@ -312,7 +312,7 @@ resource "aws_launch_template" "us_west_1" {
   key_name      = each.value.key_name
 
   dynamic "license_specification" {
-    for_each = var.launch_template.license_specification.license_configuration_arn != null ? [1] : []
+    for_each = var.launch_template.license_specification != null ? [1] : []
     content {
       license_configuration_arn = var.launch_template.license_specification.license_configuration_arn
     }
@@ -405,7 +405,7 @@ resource "aws_launch_template" "us_west_2" {
   # for list of supported instance type this is available for:
   # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/elastic-graphics.html#elastic-gpus-basics
   dynamic "elastic_gpu_specifications" {
-    for_each = var.launch_template.elastic_gpu_specifications.type != null ? [1] : []
+    for_each = var.launch_template.elastic_gpu_specifications != null ? [1] : []
     content {
       type = var.launch_template.elastic_gpu_specifications.type
     }
@@ -422,7 +422,7 @@ resource "aws_launch_template" "us_west_2" {
   instance_initiated_shutdown_behavior = var.launch_template.instance_initiated_shutdown_behavior
 
   dynamic "instance_market_options" {
-    for_each = var.launch_template.instance_market_options.market_type != null ? [1] : []
+    for_each = var.launch_template.instance_market_options != null ? [1] : []
     content {
       market_type = var.launch_template.instance_market_options.market_type
     }
@@ -433,7 +433,7 @@ resource "aws_launch_template" "us_west_2" {
   key_name      = each.value.key_name
 
   dynamic "license_specification" {
-    for_each = var.launch_template.license_specification.license_configuration_arn != null ? [1] : []
+    for_each = var.launch_template.license_specification != null ? [1] : []
     content {
       license_configuration_arn = var.launch_template.license_specification.license_configuration_arn
     }

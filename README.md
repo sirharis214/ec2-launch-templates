@@ -1,5 +1,9 @@
 # ec2-launch-templates
-Creating Linux and Windows based EC2 launch templates
+Creating Linux and Windows based EC2 launch templates. Now supporting Multi-Region templates.
+
+Most EC2 Launch Template configurations are optional. The module either defaults these configs to [null](https://developer.hashicorp.com/terraform/language/expressions/types#null) or sets the default values for them. 
+
+There are also some configurations who's values are unique per region, such as AMI's. The module breaks out all region specific configurations into a variable `var.launch_template.regions`, see [this](#multi-region-launch-templates) section for reference.
 
 # Usage
 
@@ -19,7 +23,9 @@ module "example_windows_temp" {
 }
 ```
 
-Continue reading to see which variables are required regardless of the OS and which are OS dependent. See [Linux minimum config - in VPC](#linux--minimum-config---in-vpc) for an example creating Linux based Launch Template.
+Continue reading to see which variables are required regardless of the OS and which are OS dependent.
+
+See [Linux minimum config - in VPC](#linux--minimum-config---in-vpc) for an example creating Linux based Launch Template.
 
 ## OS Dependent Variable
 
@@ -295,3 +301,88 @@ module "example_windows_launch_template" {
   }
 }
 ``` 
+
+## Multi-Region Launch Templates
+
+Theres a required argument for the variable var.launch_template called `regions`. The module uses this argument to determine which region the aws_launch_template resource will be created in. Therefore we require to always have atleast the default region's configuration defined in `var.launch_template.regions` for single region launch templates.
+
+The arguements for `var.launch_template.regions` are the region dependent configurations, such as AMI id, Key Name, Security Groups, Subnet id and placement.
+
+To create the launch template in multiple regions we add on additional Key => Val blocks for the desired region in `var.launch_template.regions`.
+
+To understand in more detail how the module creates the Launch Templates across multiple regions see [multi_region_launch_template.md](./docs/multi_region_launch_template.md)
+
+### Creating Multi-Region Launch Templates
+
+Creating launch template in default region `us-east-1` and `us-east-2`. 
+
+Copy the key => val block for us-east-1 under launch_template.regions and Paste under us-east-2 block to create the launch template in the other 2 regions as well (us-west-1, us-west-2), update the region specific values in those key => val's ofcourse. 
+
+```hcl
+module "example_linux_temp" {
+  source = "./modules/launch_template"
+
+  launch_template = {
+    name_prefix = "example-linux-temp"
+
+    iam_instance_profile = {
+      name = "main-ec2-profile"
+    }
+
+    tag_specifications = {
+      tags = {
+        OS = "linux"
+      }
+    }
+
+    regions = {
+      us-east-1 = {
+        image_id = "ami-0bb4c991fa89d4b9b" # us-east-1 Amazon Linux 2
+        key_name = "main-us-east-1"
+        network_interfaces = {
+          security_groups = [
+            "sg-077d89eca08b13f9e" # main-sg
+          ]
+          subnet_id = "subnet-038c1a5affe144076" # main-public-subnet-1 ; us-east-1a
+        }
+        regional_tags = {
+          Block_Region = "us-east-1"
+        }
+      },
+      us-east-2 = {
+        image_id = "ami-0aec300fa613b1c92" # us-east-2 Amazon Linux 2
+        network_interfaces = {
+          security_groups = [
+            "sg-041b3e39b881e6063" # default
+          ]
+          subnet_id = "subnet-06c63da68c902e819" # default public ; us-east-2a 
+        }
+        regional_tags = {
+          Block_Region = "us-east-2"
+        }
+      }
+    }
+  }
+  project_tags = local.tags
+  providers = {
+    aws           = aws
+    aws.us-east-2 = aws.us-east-2
+    aws.us-west-1 = aws.us-west-1
+    aws.us-west-2 = aws.us-west-2
+  }
+}
+```
+
+:grey_exclamation: To add a copy of the AWS Launch Template in `us-west-1` we would add the following block after us-east-2:
+
+```hcl
+us-east-2 = {
+  image_id = "ami-xxx" # us-west-1 Amazon Linux 2
+  network_interfaces = {
+    security_groups = [
+      "sg-xxx" # default
+    ]
+    subnet_id = "subnet-xxx" # default ; us-west-1X 
+  }
+}
+```
